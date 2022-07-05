@@ -1,16 +1,36 @@
 // Imports
-import React from "react";
+import React, { useRef } from "react";
 import styled from "styled-components";
+import { CSSTransition } from "react-transition-group";
 
 // Component
 const Modal = ({ closed, show }) => {
 
+	// Timings
+	const animationTiming = {
+		enter:400,
+		exit:200
+	};
+
+	// Fixing findDOMNode bug
+	const wrapperRef = useRef();
+
 	// Return
 	return(
-		<Wrapper className={ show ? 'open' : 'closed' }>
-			<h1>A Modal</h1>
-        	<button className="button" onClick={ closed }>Dismiss</button>
-		</Wrapper>
+		// Or <CSSTransition classNames="fade-slide" basic approach
+		<CSSTransition in={ show } timeout={ animationTiming } 
+			nodeRef={ wrapperRef }
+			classNames={ {
+				enter:'',
+				enterActive:'open',
+				exit:'',
+				exitActive:'closed'
+			} } mountOnEnter unmountOnExit>
+			<Wrapper ref={ wrapperRef }>
+				<h1>A Modal</h1>
+				<button className="button" onClick={ closed }>Dismiss</button>
+			</Wrapper>
+		</CSSTransition>
 	);
 
 };
@@ -30,10 +50,20 @@ const Wrapper = styled.div`
     width: 50%;
 	&.open{
 		/* forwards stop loop animation */
-		animation: openModal 0.35s ease-out forwards;
+		animation: openModal 0.4s ease-out forwards;
 	}
 	&.closed{
-		animation: closeModal 0.25s ease-in forwards;
+		animation: closeModal 0.2s ease-in forwards;
+	}
+	/* CSS Transition classes, classes will be added depending 
+	on the state of the animation */
+	&.fade-slide-enter{}
+	&.fade-slide-enter-active{
+		animation: openModal 0.4s ease-out forwards;
+	}
+	&.fade-slide-exit{}
+	&.fade-slide-exit-active{
+		animation: closeModal 0.2s ease-in forwards;
 	}
 	@keyframes openModal{
 		0%{ opacity: 0; transform: translateY(-100%); }
